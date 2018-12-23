@@ -14,11 +14,11 @@ inspectAndDescribeFile = (filePath) ->
 			result.type = 
 				if stat.isFile() then 'file'
 				else if stat.isDirectory() then 'directory'
-			resolve result
+			resolve  result 
+
+resolveFilePath = (path, file) ->
+	path.resolve path
 				
-loadDirectory = ->
-
-
 module.exports =
 
 	getUsersHomeFolder: ->

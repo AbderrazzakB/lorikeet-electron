@@ -1,15 +1,13 @@
 
-fileSystem = require './fileSystem.js'
-userInterface = require './userInterface.js'
+fileSystem = require './modules/fileSystem.js'
+userInterface = require './modules/userInterface.js'
 
 main = ->
 	try
 		userInterface.bindDocument window
-		folderPath = fileSystem.getUsersHomeFolder()
-		filesInFolder = await fileSystem.getFilesInFolder folderPath
-		inspectedFiles = await fileSystem.inspectAndDescribeFiles folderPath, filesInFolder
-		userInterface.displayFiles inspectedFiles
-			
+		usersHomePath = fileSystem.getUsersHomeFolder()
+		await userInterface.loadDirectory(usersHomePath)(window)
+		userInterface.dbclickOnDirectory(usersHomePath)
 	catch e
 		console.error e
 	

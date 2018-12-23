@@ -10,6 +10,6 @@ app.on 'window-all-closed', ->
 		app.quite() unless process.platform isnt 'darwin'
 
 app.on 'ready', ->
-		mainWindow = new BrowserWindow()
+		mainWindow = new BrowserWindow nodeIntegration: false
 		mainWindow.loadURL "#{__dirname}/index.html"
 		mainWindow.on 'closed', -> mainWindow = undefined
