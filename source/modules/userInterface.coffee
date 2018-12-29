@@ -1,6 +1,8 @@
 
-fileSystem = require './fileSystem.js'
-document = undefined
+fileSystem 	= require './fileSystem.js'
+Idx 		= require './search.js'
+idx 		= new Idx();
+document 	= undefined
 
 ###*
  * Display file in the user interface
@@ -69,8 +71,9 @@ loadDirectory = (folderPath) ->
 		.then (files) ->
 			clearView()
 			fileSystem.inspectAndDescribeFiles(folderPath, files)
-			.then (result) ->
-				displayFiles result
+			.then (results) ->
+				idx.resetIndex results
+				displayFiles results
 			.catch (error) ->
 				console.error """Unhandled error happened when we tried to 
 					inspect your directories """, error
@@ -78,7 +81,22 @@ loadDirectory = (folderPath) ->
 			console.error """Unhandled error happened when we tried to 
 					get files from your directories """, error
 
-dbclickOnDirectory =  ->
+filterResult = (results) ->
+	validFilePaths = results.map (result) ->
+		return result.ref
+	items = document.getElementsByClassName 'item'
+
+	for item in items
+		filePath = item.getAttribute 'data-path'
+		if validFilePaths.indexOf filePath isnt -1
+			item.style = null
+		else
+			item.style = 'display: none'
+
+resetFilter = ->
+	item.style = null for item in document.getElementsByClassName 'item'
+
+dblclickOnDirectory =  ->
 	mainArea = document.getElementById 'main-area'
 	mainArea.ondblclick = (event) ->
 		target = event.target.closest '.item'
@@ -88,13 +106,21 @@ dbclickOnDirectory =  ->
 			return 
 		else if target.getAttribute('data-type') is 'directory'
 			folderPath = target.getAttribute('data-path') 
-			loadDirectory(folderPath)(window)
-		
+			loadDirectory(folderPath)(window)	
 	return
 
-module.exports =
-	bindDocument: bindDocument
-	loadDirectory: loadDirectory
-	dbclickOnDirectory: dbclickOnDirectory
+keyupOnSearch = ->
+	search = document.getElementById 'search'
+	search.onkeyup = (event) ->
+		query = event.target.value
+		# resetFilter() unless query
+		res = idx.search query
 
+module.exports = {
+	bindDocument
+	loadDirectory
+	dblclickOnDirectory
+	keyupOnSearch
+	idx
+}
 	
